@@ -1,74 +1,153 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import React, { useState } from "react";
+import { SafeAreaView, View, ScrollView, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
+import { supabase } from './supabaseClient';  // Import your supabase client
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+// TypeScript interface for the component's state
+interface AuthState {
+  email: string;
+  password: string;
+}
 
-export default function HomeScreen() {
+export default function App() {
+  const [state, setState] = useState<AuthState>({ email: '', password: '' });
+
+  // Function to handle email registration
+  const handleRegister = async () => {
+    try {
+      const { user, error } = await supabase.auth.signUp({
+        email: state.email,
+        password: state.password
+      });
+
+      if (error) {
+        Alert.alert("Error", error.message);
+      } else {
+        Alert.alert("Success", "Check your email for confirmation");
+      }
+    } catch (error: any) {
+      Alert.alert("Error", error.message);
+    }
+  };
+
+  // Function to handle login
+  const handleLogin = async () => {
+    try {
+      const { user, error } = await supabase.auth.signInWithPassword({
+        email: state.email,
+        password: state.password
+      });
+
+      if (error) {
+        Alert.alert("Error", error.message);
+      } else {
+        Alert.alert("Success", "Logged in successfully!");
+      }
+    } catch (error: any) {
+      Alert.alert("Error", error.message);
+    }
+  };
+
+  // Update state
+  const handleChange = (field: keyof AuthState, value: string) => {
+    setState(prevState => ({
+      ...prevState,
+      [field]: value
+    }));
+  };
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
+    <SafeAreaView style={styles.container}>
+      <ScrollView style={styles.scrollView}>
+        <View style={styles.row}>
+          <Text style={styles.text}>{"10:00pm"}</Text>
+        </View>
+
+        <Text style={styles.text2}>{"Let’s Get Started"}</Text>
+
+        {/* Email Input */}
+        <TextInput
+          style={styles.input}
+          placeholder="Enter your email"
+          value={state.email}
+          onChangeText={(text) => handleChange('email', text)}
+          keyboardType="email-address"
         />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12'
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+
+        {/* Password Input */}
+        <TextInput
+          style={styles.input}
+          placeholder="Enter your password"
+          value={state.password}
+          onChangeText={(text) => handleChange('password', text)}
+          secureTextEntry
+        />
+
+        {/* Register Button */}
+        <TouchableOpacity style={styles.button} onPress={handleRegister}>
+          <Text style={styles.text3}>{"Register"}</Text>
+        </TouchableOpacity>
+
+        {/* Login Button */}
+        <TouchableOpacity style={styles.button} onPress={handleLogin}>
+          <Text style={styles.text3}>{"Login"}</Text>
+        </TouchableOpacity>
+
+        <Text style={styles.text5}>{"Already Registered? Log in"}</Text>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  container: {
+    flex: 1,
+    backgroundColor: "#FFFFFF",
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  button: {
+    backgroundColor: "#D9D9D9",
+    borderColor: "#000000",
+    borderRadius: 20,
+    borderWidth: 1,
+    paddingVertical: 19,
+    paddingHorizontal: 29,
+    marginBottom: 32,
+    marginLeft: 25,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  input: {
+    backgroundColor: "#F5F5F5",
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "#D9D9D9",
+    paddingHorizontal: 15,
+    paddingVertical: 12,
+    marginBottom: 20,
+    marginLeft: 25,
+    marginRight: 25,
+  },
+  text2: {
+    color: "#000000",
+    fontSize: 40,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 68,
+  },
+  text: {
+    color: "#000000",
+    fontSize: 14,
+    fontWeight: "bold",
+    marginTop: 4,
+    marginRight: 4,
+    flex: 1,
+  },
+  text3: {
+    color: "#000000",
+    fontSize: 20,
+  },
+  text5: {
+    color: "#000000",
+    fontSize: 15,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginTop: 20,
   },
 });
