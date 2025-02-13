@@ -2,8 +2,10 @@ import { View, Text, StyleSheet } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
+import { NavigationContainer } from '@react-navigation/native';
+import NavigationBar from '@/app/(tabs)/NavigationBar';
 
-export default function HomeScreen() {
+export default function App() {
   const [userName, setUserName] = useState('');
 
   useEffect(() => {
@@ -19,24 +21,27 @@ export default function HomeScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.avatarContainer}>
-          <MaterialIcons name="person" size={60} color="#666" />
+    <NavigationContainer>
+      <View style={styles.container}>
+        <NavigationBar />
+        <View style={styles.header}>
+          <View style={styles.avatarContainer}>
+            <MaterialIcons name="person" size={60} color="#666" />
+          </View>
+        </View>
+
+        <View style={styles.content}>
+          <Text style={styles.greeting}>Good{'\n'}Morning</Text>
+          <Text style={styles.name}>{userName}</Text>
+
+          <View style={styles.statusContainer}>
+            <Text style={styles.statusText}>Device</Text>
+            <Text style={styles.statusText}>Connected</Text>
+            <View style={styles.statusDot} />
+          </View>
         </View>
       </View>
-
-      <View style={styles.content}>
-        <Text style={styles.greeting}>Good{'\n'}Morning</Text>
-        <Text style={styles.name}>{userName}</Text>
-
-        <View style={styles.statusContainer}>
-          <Text style={styles.statusText}>Device</Text>
-          <Text style={styles.statusText}>Connected</Text>
-          <View style={styles.statusDot} />
-        </View>
-      </View>
-    </View>
+    </NavigationContainer>
   );
 }
 

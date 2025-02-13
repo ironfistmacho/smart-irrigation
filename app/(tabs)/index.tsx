@@ -2,6 +2,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
 import { useEffect } from 'react';
 
+
 export default function WelcomeScreen() {
   useEffect(() => {
     const timer = setTimeout(() => {
